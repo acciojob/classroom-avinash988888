@@ -75,10 +75,16 @@ public class StudentRepository {
     }
 
     public String deleteTeacherByName(String teacher){
+        List<String> list=new ArrayList<>();
         if(dbt.containsKey(teacher)){
-            dbt.remove(teacher);
-        }else return "not exists";
-
+            list=dbts.get(teacher);
+        }
+        for(String student:list){
+            if(dbs.containsKey(student)){
+                dbs.remove(student);
+            }
+        }
+        dbt.remove(teacher);
         return "remove successfully";
     }
 
