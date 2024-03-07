@@ -45,7 +45,7 @@ public class StudentRepository {
             }
             return studentlist;
         }
-        public List<String> getAllTeachers(){
+        public List<String> getAllTeacher(){
         List<String> teacherlist=new ArrayList<>();
         for(Teacher teacher:dbt.values()){
             teacherlist.add(teacher.getName());
@@ -75,32 +75,11 @@ public class StudentRepository {
     }
 
     public String deleteTeacherByName(String teacher){
-        List<String> list=new ArrayList<>();
-        if(dbt.containsKey(teacher)){
-            list=dbts.get(teacher);
-        }
-        for(String student:list){
-            if(dbs.containsKey(student)){
-                dbs.remove(student);
-            }
-        }
-        dbt.remove(teacher);
-        return "remove successfully";
+        dbs.remove(teacher);
+
+        return "deleted successfully";
     }
 
 
-    public String deleteAllTeachers() {
-          List<String> list=new ArrayList<>();
-          for(String teacher:dbt.keySet()){
-              list.addAll(dbts.getOrDefault(teacher,new ArrayList<>()));
-              if(dbts.containsKey(teacher)){
-                  dbts.remove(teacher);
-              }
-          }
-          for(String student:list){
-              dbs.remove(student);
-          }
-          dbt.clear();
-          return "deleted successfully";
-    }
+
 }

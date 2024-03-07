@@ -34,12 +34,23 @@ public class StudentService {
        return repoObj.getTeacherByName(name);
     }
 
+    public void deleteTeacherByName(String teacher) {
+        List<String> students=getStudentsByTeacherName(teacher);
+        repoObj. deleteTeacherByName(teacher);
+        for(String stud:students){
+            repoObj.deleteTeacherByName(stud);
+        }
+
+    }
     public List<String> getStudentsByTeacherName(String teacher){
         return repoObj.getStudentsByTeacherName(teacher);
     }
     public String deleteAllTeachers(){
-       repoObj.deleteAllTeachers();
-       return "deleted successfully";
+        List<String> teacher=repoObj.getAllTeacher();
+        for(String tech:teacher){
+            deleteTeacherByName(tech);
+        }
+        return "deleted successfully";
     }
 
     public List<String> getAllStudent(){
