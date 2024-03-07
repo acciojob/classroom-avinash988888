@@ -2,60 +2,79 @@ package com.driver;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
-@Service
+import java.util.Optional;
+
 public class StudentService {
 
-    @Autowired
-    private StudentRepository repoObj;
 
-    public String addStudent(Student student) {
-        String res = repoObj.addStudent(student);
-        return res;
-    }
-    public String addTeacher(Teacher teacher){
-        String res=repoObj.addTeacher(teacher);
-        return res;
+    private StudentRepository studentRepository=new StudentRepository();
+
+
+    public void addStudent(Student student) {
+        studentRepository.add(student);
+
     }
 
-    public String addStudentTeacherPair(String student,String teacher){
-        String res= repoObj.addStudentTeacherPair(student,teacher);
-        return res;
+    public void addTeacher(Teacher teacher) {
+        studentRepository.addTeacher(teacher);
     }
 
-    public Student getStudentByName(String name){
+    public void addStudentTeacherPair(String student, String teacher) {
+        Optional<Student> studentOptional=studentRepository.getstudent(student);
+        Optional<Teacher> teacherOptional=studentRepository.getTeacher(teacher);
+        if(studentOptional.isEmpty()){
+            throw new RuntimeException("student not present in the database");
+        }
+        if(teacherOptional.isEmpty()){
+            throw new RuntimeException("teacher not present in the database");
+        }
+        Teacher teacherObj=teacherOptional.get();
+        teacherObj.setNumberOfStudents(teacherObj.getNumberOfStudents()+1);
+        studentRepository.addTeacher(teacherObj);
+        studentRepository.addStudentTeacherPair(student,teacher);
 
-      return repoObj.getStudentByName(name);
+
+
     }
 
-    public Teacher getTeacherByName(String name){
-       return repoObj.getTeacherByName(name);
+    public Student studentByName(String name) {
+        Optional<Student> studentsOpt= studentRepository.getstudent(name);
+        if(studentsOpt.isPresent()) {
+            return studentsOpt.get();
+        }
+        throw new RuntimeException("student not present");
+    }
+
+    public Teacher teacherByName(String name) {
+        Optional<Teacher> teacherOpt= studentRepository.getTeacher(name);
+        if(teacherOpt.isPresent()) {
+            return teacherOpt.get();
+        }
+        throw new RuntimeException("student not present");
+    }
+
+    public List<String> getStudentByTeacherName(String teacher) {
+        return studentRepository.getStudentByTeacherName(teacher);
+    }
+
+    public List<String> getAllStudent() {
+        return studentRepository.getAllStudent();
     }
 
     public void deleteTeacherByName(String teacher) {
-        List<String> students=getStudentsByTeacherName(teacher);
-        repoObj. deleteTeacherByName(teacher);
+        List<String> students=getStudentByTeacherName(teacher);
+        studentRepository.deleteTeacher(teacher);
         for(String stud:students){
-            repoObj.deleteTeacherByName(stud);
+            studentRepository.deleteStudent(stud);
         }
 
     }
-    public List<String> getStudentsByTeacherName(String teacher){
-        return repoObj.getStudentsByTeacherName(teacher);
-    }
-    public String deleteAllTeachers(){
-        List<String> teacher=repoObj.getAllTeacher();
+
+    public void deleteAllTeacher() {
+        List<String> teacher=studentRepository.getAllTeacher();
         for(String tech:teacher){
             deleteTeacherByName(tech);
         }
-        return "deleted successfully";
     }
-
-    public List<String> getAllStudent(){
-
-        return repoObj.getAllStudent();
-    }
-
 }
